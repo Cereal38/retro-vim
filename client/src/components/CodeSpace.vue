@@ -3,6 +3,9 @@
     import { ref } from "vue";
 
     const initialRowLen = 5;
+    const maxRowLen = 80;
+
+    const mode = ref("normal");
 
     // Current cursor position (x : horizontal / y : vertical)
     const cursor = ref({
@@ -11,7 +14,7 @@
     })
 
     const checkCursorPosition = (x: number, y: number) => {
-        if (x < initialRowLen || x > 85 || y < 0 || y > 1000) { return 0 }
+        if (x < initialRowLen || x > maxRowLen + initialRowLen || y < 0 || y > 1000) { return 0 }
         return 1;
     }
 
@@ -21,8 +24,11 @@
     // Handle char inputs
     window.addEventListener("keypress", function(e) {
 
+        // Only work in insert mpde
+        if (mode.value !== "insert") { return }
+
         // 80 char max per line
-        if (lines.value[cursor.value.y].length > 79) { return }
+        if (lines.value[cursor.value.y].length >= maxRowLen) { return }
 
         lines.value[cursor.value.y] = lines.value[cursor.value.y] + String.fromCharCode(e.keyCode);
 
@@ -66,12 +72,47 @@
                 lines.value[cursor.value.y] = lines.value[cursor.value.y] + '    ';
                 cursor.value.x += 4;
                 break;
+            
+            // Move (if not in insert mode)
+            case "h":
+                if (mode.value === "insert") { return }
+                if (!checkCursorPosition(cursor.value.x - 1, cursor.value.y)) { return }
+                cursor.value.x--;
+                break;
+            case "j":
+                if (mode.value === "insert") { return }
+                if (!checkCursorPosition(cursor.value.x, cursor.value.y + 1)) { return }
+                cursor.value.y++;
+                break;
+            case "k":
+                if (mode.value === "insert") { return }
+                if (!checkCursorPosition(cursor.value.x, cursor.value.y - 1)) { return }
+                cursor.value.y--;
+                break;
+            case "l":
+                if (mode.value === "insert") { return }
+                if (!checkCursorPosition(cursor.value.x + 1, cursor.value.y)) { return }
+                cursor.value.x++;
+                break;
+            
+            // Switch in insert mode (if in normal)
+            case "i":
+                if (mode.value === "insert") { return }
+                event?.preventDefault();
+                mode.value = "insert";
+                break;
+            
+            // Switch in normal mode
+            case "Escape":
+                mode.value = "normal";
+                break;
+
 
             default:
                 break;
         }
 
-        console.log(lines)
+        console.log(e.key)
 
     }.bind(this));
 
@@ -129,6 +170,15 @@
         <!-- Cursor -->
         <div 
             class="code-space__cursor-insert"
+            v-if="mode == 'insert'"
+            :style="{
+                gridColumn: cursor.x + 1,
+                gridRow: cursor.y + 1,
+            }"
+        />
+        <div 
+            class="code-space__cursor-normal"
+            v-if="mode == 'normal'"
             :style="{
                 gridColumn: cursor.x + 1,
                 gridRow: cursor.y + 1,
@@ -143,7 +193,7 @@
 
     .code-space {
         display: grid;
-        grid-template-columns: repeat(80, 20px);
+        grid-template-columns: repeat(85, 20px);
         row-gap: 4px;
         grid-auto-rows: 20px;
         height: 100%;
@@ -157,10 +207,16 @@
     }
 
     .code-space__cursor-insert {
-        margin-top: 15px;
+        transform: translateY(22px);
         height: 5px;
         width: 20px;
         background-color: aliceblue;
+    }
+
+    .code-space__cursor-normal {
+        height: 20px;
+        width: 20px;
+        background-color: rgb(240, 248, 255, 0.7);
     }
     
 </style>

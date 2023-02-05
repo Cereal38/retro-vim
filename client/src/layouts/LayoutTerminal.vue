@@ -23,7 +23,7 @@ import CodeSpace from "@/components/CodeSpace.vue"
     width: calc(100vw - 40px);
     font-family: "Press Start 2P", cursive;
     background-color: #1d1d1d;
-    color: #f1e533dc;
+    color: #12da33dc;
 }
 
 </style>
