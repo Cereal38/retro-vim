@@ -40,7 +40,20 @@
                 string.value.push("");
                 cursor.value.y++;
                 break;
+            
+            // Add a tab
+            case "Tab":
+                event?.preventDefault(); // Remove the normal behavior of the tab key
+                string.value[cursor.value.y] = string.value[cursor.value.y] + '    ';
+                break;
+
+            default:
+                break;
         }
+        
+        // DEBUG
+        console.log(e.key)
+
     }.bind(this));
 
     // String that take use input
@@ -59,7 +72,7 @@
                 v-for="(line, index) in string" 
                 :key="index"
             >
-                {{ index + 1  }} : {{ line }}
+                {{ index + 1  }} : <span v-html="line.replace(/ /g, '&nbsp;')"></span> <!-- Allow to display all spaces -->
             </li>
 
         </ul>
