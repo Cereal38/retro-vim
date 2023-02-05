@@ -1,13 +1,12 @@
 <script setup lang="ts">
+import CodeSpace from "@/components/CodeSpace.vue"
 </script>
 
 
 <template>
     <div class="layout-terminal__main">
-        
-        <div class="layout-terminal__main__code-space">
 
-        </div>
+        <CodeSpace />
 
     </div>
 </template>
