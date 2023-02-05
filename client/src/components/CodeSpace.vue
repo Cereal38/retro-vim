@@ -3,12 +3,19 @@
     import { ref } from "vue";
 
 
-    const string = ref(["1 : ", "2 : "]);
+    // Current cursor position (x : horizontal / y : vertical)
+    const cursor = ref({
+        x: 0,
+        y: 0,
+    })
+
+    // Lines of code
+    const string = ref([""]);
 
     // Handle char inputs
     window.addEventListener("keypress", function(e) {
 
-        string.value[0] = string.value[0] + String.fromCharCode(e.keyCode);
+        string.value[cursor.value["y"]] = string.value[cursor.value["y"]] + String.fromCharCode(e.keyCode);
 
     }.bind(this));
 
@@ -19,7 +26,13 @@
 
             // Delete last char
             case "Backspace":
-                string.value[0] = string.value[0].slice(0, -1);
+                string.value[cursor.value["y"]] = string.value[cursor.value["y"]].slice(0, -1);
+                break;
+            
+            // Create a new line and put cursor on it
+            case "Enter":
+                string.value.push("");
+                cursor.value["y"]++;
                 break;
         }
         console.log(e);
@@ -38,8 +51,10 @@
 
             <li 
                 class="code-space__lines__line" 
-                v-for="line in string" 
-                :key="line">{{ line }}
+                v-for="(line, index) in string" 
+                :key="index"
+            >
+                {{ index + 1  }} : {{ line }}
             </li>
 
         </ul>
