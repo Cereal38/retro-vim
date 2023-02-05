@@ -2,7 +2,6 @@
 
     import { ref } from "vue";
 
-
     // Current cursor position (x : horizontal / y : vertical)
     const cursor = ref({
         x: 0,
@@ -10,13 +9,20 @@
     })
 
     // Lines of code
-    const string = ref([""]);
+    const lines = ref([""]);
 
     // Handle char inputs
     window.addEventListener("keypress", function(e) {
 
-        string.value[cursor.value.y] = string.value[cursor.value.y] + String.fromCharCode(e.keyCode);
+        // 80 char max per line
+        if (lines.value[cursor.value.y].length > 79) { return }
 
+        // Return on some keys
+        if (e.key === "Enter") { return }
+
+        lines.value[cursor.value.y] = lines.value[cursor.value.y] + String.fromCharCode(e.keyCode);
+        cursor.value.x++;
+        
     }.bind(this));
 
     // Handle inputs as Escape, Backspace etc...
@@ -27,24 +33,27 @@
             // Delete last char
             // If the line is empty, delete the line (Except for the first one)
             case "Backspace":
-                if (string.value[cursor.value.y].length === 1 && string.value.length > 1) {
-                    string.value.splice(cursor.value.y, 1);
+                if (lines.value[cursor.value.y].length === 1 && lines.value.length > 1) {
+                    lines.value.splice(cursor.value.y, 1);
                     cursor.value.y--;
+                    cursor.value.x = lines.value[cursor.value.y].length;
                 } else {
-                    string.value[cursor.value.y] = string.value[cursor.value.y].slice(0, -1);
+                    lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, -1);
+                    cursor.value.x--;
                 }
                 break;
             
             // Create a new line and put cursor on it
             case "Enter":
-                string.value.push("");
+                lines.value.push("");
                 cursor.value.y++;
+                cursor.value.x = 0;
                 break;
             
             // Add a tab
             case "Tab":
                 event?.preventDefault(); // Remove the normal behavior of the tab key
-                string.value[cursor.value.y] = string.value[cursor.value.y] + '    ';
+                lines.value[cursor.value.y] = lines.value[cursor.value.y] + '    ';
                 break;
 
             default:
@@ -52,11 +61,11 @@
         }
         
         // DEBUG
-        console.log(e.key)
+        console.log(lines.value)
 
     }.bind(this));
 
-    // String that take use input
+    // lines that take use input
 
 
 </script>
@@ -64,18 +73,37 @@
 
 <template>
     <div class="code-space">
-
-        <ul class="code-space__lines">
-
+        <ul>
             <li 
-                class="code-space__lines__line" 
-                v-for="(line, index) in string" 
-                :key="index"
+                class="code-space__line" 
+                v-for="(line, indexLine) in lines" 
+                :key="indexLine"
             >
-                {{ index + 1  }} : <span v-html="line.replace(/ /g, '&nbsp;')"></span> <!-- Allow to display all spaces -->
+                <span 
+                    class="code-space__line__char" 
+                    v-for="(char, indexChar) in line"
+                    :key="indexChar"
+                >
+                    <span 
+                        class="code-space__line__char__display"
+                        v-html="char.replace(/ /g, '&nbsp;')"
+                        :style="{
+                            gridColumn: indexChar + 1,
+                            gridRow: indexLine + 1,
+                        }"
+                    ></span>
+                </span>
             </li>
-
         </ul>
+
+        <!-- Cursor -->
+        <div 
+            class="code-space__cursor"
+            :style="{
+                gridColumn: cursor.x + 1,
+                gridRow: cursor.y + 1,
+            }"
+        />
 
     </div>
 </template>
@@ -84,18 +112,19 @@
 <style scoped>
 
     .code-space {
+        display: grid;
+        grid-template-columns: repeat(80, 20px);
+        row-gap: 4px;
+        grid-auto-rows: 20px;
         height: 100%;
         width: 100%;
+        font-size: 20px;
     }
 
-    .code-space__lines {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
+    .code-space__cursor {
+        height: 20px;
+        width: 20px;
+        background-color: aliceblue;
     }
-
-    .code-space__lines__line {
-        all: unset;
-    }
-
+    
 </style>
