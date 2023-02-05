@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import HelloWorld from "@/components/HelloWorld.vue"
+import LayoutTerminal from "@/layouts/LayoutTerminal.vue"
 </script>
 
 <template>
@@ -22,9 +23,9 @@ import HelloWorld from './components/HelloWorld.vue'
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #ff6cffff);
 }
 .logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+  filter: drop-shadow(0 0 2em #42b883ff);
 }
 </style>
