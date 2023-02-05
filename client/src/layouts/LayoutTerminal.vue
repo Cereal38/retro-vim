@@ -4,8 +4,10 @@
 
 <template>
     <div class="layout-terminal__main">
+        
+        <div class="layout-terminal__main__code-space">
 
-        <h1 class="temp-title">Hello world; It start now !</h1>
+        </div>
 
     </div>
 </template>
@@ -17,16 +19,17 @@
 
 .layout-terminal__main {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    height: 100vh;
-    width: 100vw;
-    background-color: #0A000A;
+    padding: 20px;
+    height: calc(100vh - 40px);
+    width: calc(100vw - 40px);
     font-family: "Press Start 2P", cursive;
+    background-color: #0A000A;
+    color: #55AA00;
 }
 
-.temp-title {
-    color: green;
+.layout-terminal__main__code-space {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 </style>

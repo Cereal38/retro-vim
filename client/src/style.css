@@ -1,10 +1,10 @@
 
 body {
-  all: inherit;
+    all: inherit;
 }
 
 h1 {
-  all: unset;
-  font-size: 2rem;
-  font-weight: bold;
+    all: unset;
+    font-size: 2rem;
+    font-weight: bold;
 }
