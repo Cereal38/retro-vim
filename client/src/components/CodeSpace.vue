@@ -17,11 +17,11 @@
         // 80 char max per line
         if (lines.value[cursor.value.y].length > 79) { return }
 
-        // Return on some keys
-        if (e.key === "Enter") { return }
-
         lines.value[cursor.value.y] = lines.value[cursor.value.y] + String.fromCharCode(e.keyCode);
-        cursor.value.x++;
+
+        if (e.key !== "Enter") {
+            cursor.value.x++;
+        }
         
     }.bind(this));
 
@@ -36,7 +36,7 @@
                 if (lines.value[cursor.value.y].length === 1 && lines.value.length > 1) {
                     lines.value.splice(cursor.value.y, 1);
                     cursor.value.y--;
-                    cursor.value.x = lines.value[cursor.value.y].length;
+                    cursor.value.x = lines.value[cursor.value.y].length-1;
                 } else {
                     lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, -1);
                     cursor.value.x--;
@@ -73,28 +73,25 @@
 
 <template>
     <div class="code-space">
-        <ul>
-            <li 
-                class="code-space__line" 
-                v-for="(line, indexLine) in lines" 
-                :key="indexLine"
+        <div 
+            class="code-space__lines__line" 
+            v-for="(line, indexLine) in lines" 
+            :key="indexLine"
+            :style="{
+                gridColumn: 1,
+                gridRow: indexLine + 1,
+            }"
+        >
+            <span 
+                class="code-space__lines__line__content" 
+                v-for="(char, indexChar) in line"
+                :key="indexChar"
             >
                 <span 
-                    class="code-space__line__char" 
-                    v-for="(char, indexChar) in line"
-                    :key="indexChar"
-                >
-                    <span 
-                        class="code-space__line__char__display"
-                        v-html="char.replace(/ /g, '&nbsp;')"
-                        :style="{
-                            gridColumn: indexChar + 1,
-                            gridRow: indexLine + 1,
-                        }"
-                    ></span>
-                </span>
-            </li>
-        </ul>
+                    v-html="char.replace(/ /g, '&nbsp;')"
+                ></span>
+            </span>
+        </div>
 
         <!-- Cursor -->
         <div 
