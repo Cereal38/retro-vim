@@ -15,7 +15,7 @@
     // Handle char inputs
     window.addEventListener("keypress", function(e) {
 
-        string.value[cursor.value["y"]] = string.value[cursor.value["y"]] + String.fromCharCode(e.keyCode);
+        string.value[cursor.value.y] = string.value[cursor.value.y] + String.fromCharCode(e.keyCode);
 
     }.bind(this));
 
@@ -25,17 +25,22 @@
         switch (e.key) {
 
             // Delete last char
+            // If the line is empty, delete the line (Except for the first one)
             case "Backspace":
-                string.value[cursor.value["y"]] = string.value[cursor.value["y"]].slice(0, -1);
+                if (string.value[cursor.value.y].length === 1 && string.value.length > 1) {
+                    string.value.splice(cursor.value.y, 1);
+                    cursor.value.y--;
+                } else {
+                    string.value[cursor.value.y] = string.value[cursor.value.y].slice(0, -1);
+                }
                 break;
             
             // Create a new line and put cursor on it
             case "Enter":
                 string.value.push("");
-                cursor.value["y"]++;
+                cursor.value.y++;
                 break;
         }
-        console.log(e);
     }.bind(this));
 
     // String that take use input
