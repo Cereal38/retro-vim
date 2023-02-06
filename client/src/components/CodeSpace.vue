@@ -73,8 +73,9 @@
 				}
 				break;
 
-            // Create a new line and put cursor on it
+            // Create a new line and put cursor on it (if in insert mode)
             case "Enter":
+				if (mode.value !== "insert") { return }
                 lines.value.push("");
                 cursor.value.y++;
                 cursor.value.x = initialRowLen;
@@ -128,6 +129,20 @@
 				if (mode.value === "insert") { return }
 				if (!checkCursorPosition(cursor.value.x + 1, cursor.value.y)) { return }
 				lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen + 1) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 2);
+				break;
+
+			// Move to the first line of the file
+			case "g":
+				if (mode.value === "insert") { return }
+				cursor.value.y = 0;
+				cursor.value.x = initialRowLen;
+				break;
+
+			// Move to the last line of the file
+			case "G":
+				if (mode.value === "insert") { return }
+				cursor.value.y = lines.value.length - 1;
+				cursor.value.x = lines.value[cursor.value.y].length + initialRowLen - 1;
 				break;
 
 			// Switch in insert mode (if in normal) but after the cursor
