@@ -155,6 +155,25 @@
 				cursor.value.x = initialRowLen;
 				break;
 
+			// Insert a new line before the current one and switch in insert mode
+			case "O":
+				if (mode.value === "insert") { return }
+				event?.preventDefault();
+				mode.value = "insert";
+				lines.value.splice(cursor.value.y, 0, "\r");
+				cursor.value.x = initialRowLen;
+				break;
+
+			// Insert a new line after the current one and switch in insert mode
+			case "o":
+				if (mode.value === "insert") { return }
+				event?.preventDefault();
+				mode.value = "insert";
+				lines.value.splice(cursor.value.y + 1, 0, "\r");
+				cursor.value.y++;
+				cursor.value.x = initialRowLen;
+				break;
+
             // Switch in insert mode (if in normal)
             case "i":
                 if (mode.value === "insert") { return }
