@@ -87,13 +87,27 @@
                 break;
             case "j":
                 if (mode.value === "insert") { return }
-                if (!checkCursorPosition(cursor.value.x, cursor.value.y + 1)) { return }
-                cursor.value.y++;
+				// If the next line is shorter than the current one, move to the end of the next line
+                if (lines.value[cursor.value.y + 1]?.length < cursor.value.x - initialRowLen) {
+					cursor.value.x = lines.value[cursor.value.y + 1].length + initialRowLen - 1;
+					cursor.value.y++;
+					return;
+				}
+				// If the destination is illegal
+				if (!checkCursorPosition(cursor.value.x, cursor.value.y + 1)) { return }
+				cursor.value.y++;
                 break;
             case "k":
                 if (mode.value === "insert") { return }
-                if (!checkCursorPosition(cursor.value.x, cursor.value.y - 1)) { return }
-                cursor.value.y--;
+				// If the previous line is shorter than the current one, move to the end of the previous line
+				if (lines.value[cursor.value.y - 1]?.length < cursor.value.x - initialRowLen) {
+					cursor.value.x = lines.value[cursor.value.y - 1].length + initialRowLen - 1;
+					cursor.value.y--;
+					return;
+				}
+				// If the destination is illegal
+				if (!checkCursorPosition(cursor.value.x, cursor.value.y - 1)) { return }
+				cursor.value.y--;
                 break;
             case "l":
                 if (mode.value === "insert") { return }
