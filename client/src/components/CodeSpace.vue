@@ -65,7 +65,14 @@
                 }
 
                 break;
-            
+
+			// Delete the char under the cursor
+			case "Delete":
+				if (lines.value[cursor.value.y].length > 1) {
+					lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen + 1) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 2);
+				}
+				break;
+
             // Create a new line and put cursor on it
             case "Enter":
                 lines.value.push("");
