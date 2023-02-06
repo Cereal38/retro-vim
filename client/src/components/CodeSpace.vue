@@ -36,7 +36,8 @@
         // 80 char max per line
         if (lines.value[cursor.value.y].length >= maxRowLen) { return }
 
-        lines.value[cursor.value.y] = lines.value[cursor.value.y] + String.fromCharCode(e.keyCode);
+		// Add a caracter to the current line at the cursor position
+        lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen + 1) + String.fromCharCode(e.keyCode) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 1);
 
         if (e.key !== "Enter") {
             cursor.value.x++;
@@ -49,17 +50,17 @@
 
         switch (e.key) {
 
-            // Delete last char
+            // Delete the char before the cursor
             // If the line is empty, delete the line (Except for the first one)
             case "Backspace":
-
+				if (mode.value !== "insert") { return }
                 if (cursor.value.y > 0 && lines.value[cursor.value.y].length === 1) {
                     lines.value.splice(cursor.value.y, 1);
                     cursor.value.y--;
                     cursor.value.x = lines.value[cursor.value.y].length - 1 + initialRowLen;
                 } else {
                     if (!checkCursorPosition(cursor.value.x - 1, cursor.value.y)) { return }
-                    lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, -1);
+					lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 1);
                     cursor.value.x--;
                 }
 
@@ -121,7 +122,7 @@
 				if (!checkCursorPosition(cursor.value.x + 1, cursor.value.y)) { return }
 				lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen + 1) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 2);
 				break;
-            
+
             // Switch in insert mode (if in normal)
             case "i":
                 if (mode.value === "insert") { return }
