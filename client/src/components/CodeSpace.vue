@@ -130,6 +130,15 @@
 				lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen + 1) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 2);
 				break;
 
+			// Switch in insert mode (if in normal) but after the cursor
+			case "a":
+				if (mode.value === "insert") { return }
+				event?.preventDefault();
+				mode.value = "insert";
+				if (!checkCursorPosition(cursor.value.x + 1, cursor.value.y)) { return }
+				cursor.value.x++;
+				break;
+
             // Switch in insert mode (if in normal)
             case "i":
                 if (mode.value === "insert") { return }
