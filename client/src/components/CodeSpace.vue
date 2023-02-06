@@ -14,8 +14,14 @@
     })
 
     const checkCursorPosition = (x: number, y: number) => {
-        if (x < initialRowLen || x > maxRowLen + initialRowLen || y < 0 || y > 1000) { return 0 }
-        return 1;
+        if (
+			x < initialRowLen || 
+			x > lines.value[cursor.value.y].length + initialRowLen - 1 ||
+			y < 0 ||
+			y > lines.value.length - 1
+		) { return false }
+
+        return true;
     }
 
     // Lines of code
