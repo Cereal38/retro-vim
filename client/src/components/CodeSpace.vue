@@ -139,6 +139,22 @@
 				cursor.value.x++;
 				break;
 
+			// Switch in insert mode (if in normal) at the start of the line
+			case "A":
+				if (mode.value === "insert") { return }
+				event?.preventDefault();
+				mode.value = "insert";
+				cursor.value.x = lines.value[cursor.value.y].length + initialRowLen - 1;
+				break;
+
+			// Switch in insert mode (if in normal) at the start of the line
+			case "I":
+				if (mode.value === "insert") { return }
+				event?.preventDefault();
+				mode.value = "insert";
+				cursor.value.x = initialRowLen;
+				break;
+
             // Switch in insert mode (if in normal)
             case "i":
                 if (mode.value === "insert") { return }
