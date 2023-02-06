@@ -114,6 +114,13 @@
                 if (!checkCursorPosition(cursor.value.x + 1, cursor.value.y)) { return }
                 cursor.value.x++;
                 break;
+
+			// Remove char under cursor
+			case "x":
+				if (mode.value === "insert") { return }
+				if (!checkCursorPosition(cursor.value.x + 1, cursor.value.y)) { return }
+				lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen + 1) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 2);
+				break;
             
             // Switch in insert mode (if in normal)
             case "i":
