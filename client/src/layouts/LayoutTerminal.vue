@@ -25,7 +25,7 @@
     width: calc(100vw - 40px);
     font-family: "Press Start 2P", cursive;
     background-color: #1d1d1d;
-    color: #52fa33fc;
+    color: #52fa33;
 }
 
 .layout-terminal__layer {

@@ -210,13 +210,13 @@
         transform: translateY(22px);
         height: 5px;
         width: 20px;
-        background-color: aliceblue;
+        background-color: #52fa33;
     }
 
     .code-space__cursor-normal {
         height: 20px;
         width: 20px;
-        background-color: rgb(240, 248, 255, 0.7);
+        background-color: #52fa33;
     }
     
 </style>
