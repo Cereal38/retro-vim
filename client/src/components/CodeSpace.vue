@@ -48,6 +48,8 @@
     // Handle inputs as Escape, Backspace etc...
     window.addEventListener("keydown", function(e) {
 
+        console.log("KEY :", e.key)
+
         switch (e.key) {
 
             // Delete the char before the cursor
@@ -97,7 +99,7 @@
             case "j":
                 if (mode.value === "insert") { return }
 				// If the next line is shorter than the current one, move to the end of the next line
-                if (lines.value[cursor.value.y + 1]?.length < cursor.value.x - initialRowLen) {
+                if (lines.value[cursor.value.y + 1]?.length - 1 < cursor.value.x - initialRowLen) {
 					cursor.value.x = lines.value[cursor.value.y + 1].length + initialRowLen - 1;
 					cursor.value.y++;
 					return;
@@ -109,7 +111,7 @@
             case "k":
                 if (mode.value === "insert") { return }
 				// If the previous line is shorter than the current one, move to the end of the previous line
-				if (lines.value[cursor.value.y - 1]?.length < cursor.value.x - initialRowLen) {
+				if (lines.value[cursor.value.y - 1]?.length - 1 < cursor.value.x - initialRowLen) {
 					cursor.value.x = lines.value[cursor.value.y - 1].length + initialRowLen - 1;
 					cursor.value.y--;
 					return;
@@ -206,11 +208,7 @@
                 break;
         }
 
-        console.log(e.key)
-
     }.bind(this));
-
-    // lines that take use input
 
 
 </script>
