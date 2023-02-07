@@ -5,7 +5,8 @@
     const initialRowLen = 5;
     const maxRowLen = 80;
 
-    const mode = ref("normal");
+    // Lines of code
+    const lines = ref(["\r"]);
 
     // Current cursor position (x : horizontal / y : vertical)
     const cursor = ref({
@@ -13,201 +14,57 @@
         y: 0,
     })
 
-    const checkCursorPosition = (x: number, y: number) => {
-        if (
-			x < initialRowLen || 
-			x > lines.value[cursor.value.y].length + initialRowLen - 1 ||
-			y < 0 ||
-			y > lines.value.length - 1
-		) { return false }
+	// States of the automata
+	const INIT = "INIT";
+	const INSERT = "INSERT";
+	const NUM = "NUM";
+	
+	// Alphabet of the automata
+	const I = "i";
+	const ESC = "Escape";
 
-        return true;
-    }
+	// Transition table
+	const transitions = (input) => {
+		
+		switch (automata.value) {
+			case INIT:
+				switch (input) {
+					case I:
+						automata.value = INSERT; break;
+					case ESC:
+						automata.value = INIT; break;
+					default:
+						console.log("Error (Input unknown)");
+						automata.value = INIT; break;
+				}
+				break;
+			case INSERT:
+				switch (input) {
+					case ESC:
+						automata.value = INIT; break;
+					default:
+						console.log("TODO: Write input");
+						//lines.value[cursor.value.y] += input;
+						break;
+				}
+				break;
+			default:
+				console.log("ERROR (Current state unknown) :", automata.value);
+				return INIT;
+		}
+	}
 
-    // Lines of code
-    const lines = ref(["\r"]);
+	const automata = ref(INIT);
 
-    // Handle char inputs
-    window.addEventListener("keypress", function(e) {
-
-        // Only work in insert mpde
-        if (mode.value !== "insert") { return }
-
-        // 80 char max per line
-        if (lines.value[cursor.value.y].length >= maxRowLen) { return }
-
-		// Add a caracter to the current line at the cursor position
-        lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen + 1) + String.fromCharCode(e.keyCode) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 1);
-
-        if (e.key !== "Enter") {
-            cursor.value.x++;
-        }
-        
-    }.bind(this));
-
-    // Handle inputs as Escape, Backspace etc...
+    // Handle inputs
     window.addEventListener("keydown", function(e) {
 
         console.log("KEY :", e.key)
 
-        switch (e.key) {
+		transitions(e.key);
 
-            // Delete the char before the cursor
-            // If the line is empty, delete the line (Except for the first one)
-            case "Backspace":
-				if (mode.value !== "insert") { return }
-                if (cursor.value.y > 0 && lines.value[cursor.value.y].length === 1) {
-                    lines.value.splice(cursor.value.y, 1);
-                    cursor.value.y--;
-                    cursor.value.x = lines.value[cursor.value.y].length - 1 + initialRowLen;
-                } else {
-                    if (!checkCursorPosition(cursor.value.x - 1, cursor.value.y)) { return }
-					lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 1);
-                    cursor.value.x--;
-                }
-
-                break;
-
-			// Delete the char under the cursor
-			case "Delete":
-				if (lines.value[cursor.value.y].length > 1) {
-					lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen + 1) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 2);
-				}
-				break;
-
-            // Create a new line and put cursor on it (if in insert mode)
-            case "Enter":
-				if (mode.value !== "insert") { return }
-                lines.value.push("");
-                cursor.value.y++;
-                cursor.value.x = initialRowLen;
-                break;
-            
-            // Add a tab
-            case "Tab":
-                event?.preventDefault(); // Remove the normal behavior of the tab key
-                lines.value[cursor.value.y] = lines.value[cursor.value.y] + '    ';
-                cursor.value.x += 4;
-                break;
-            
-            // Move (if not in insert mode)
-            case "h":
-                if (mode.value === "insert") { return }
-                if (!checkCursorPosition(cursor.value.x - 1, cursor.value.y)) { return }
-                cursor.value.x--;
-                break;
-            case "j":
-                if (mode.value === "insert") { return }
-				// If the next line is shorter than the current one, move to the end of the next line
-                if (lines.value[cursor.value.y + 1]?.length - 1 < cursor.value.x - initialRowLen) {
-					cursor.value.x = lines.value[cursor.value.y + 1].length + initialRowLen - 1;
-					cursor.value.y++;
-					return;
-				}
-				// If the destination is illegal
-				if (!checkCursorPosition(cursor.value.x, cursor.value.y + 1)) { return }
-				cursor.value.y++;
-                break;
-            case "k":
-                if (mode.value === "insert") { return }
-				// If the previous line is shorter than the current one, move to the end of the previous line
-				if (lines.value[cursor.value.y - 1]?.length - 1 < cursor.value.x - initialRowLen) {
-					cursor.value.x = lines.value[cursor.value.y - 1].length + initialRowLen - 1;
-					cursor.value.y--;
-					return;
-				}
-				// If the destination is illegal
-				if (!checkCursorPosition(cursor.value.x, cursor.value.y - 1)) { return }
-				cursor.value.y--;
-                break;
-            case "l":
-                if (mode.value === "insert") { return }
-                if (!checkCursorPosition(cursor.value.x + 1, cursor.value.y)) { return }
-                cursor.value.x++;
-                break;
-
-			// Remove char under cursor
-			case "x":
-				if (mode.value === "insert") { return }
-				if (!checkCursorPosition(cursor.value.x + 1, cursor.value.y)) { return }
-				lines.value[cursor.value.y] = lines.value[cursor.value.y].slice(0, cursor.value.x - initialRowLen + 1) + lines.value[cursor.value.y].slice(cursor.value.x - initialRowLen + 2);
-				break;
-
-			// Move to the first line of the file
-			case "g":
-				if (mode.value === "insert") { return }
-				cursor.value.y = 0;
-				cursor.value.x = initialRowLen;
-				break;
-
-			// Move to the last line of the file
-			case "G":
-				if (mode.value === "insert") { return }
-				cursor.value.y = lines.value.length - 1;
-				cursor.value.x = lines.value[cursor.value.y].length + initialRowLen - 1;
-				break;
-
-			// Switch in insert mode (if in normal) but after the cursor
-			case "a":
-				if (mode.value === "insert") { return }
-				event?.preventDefault();
-				mode.value = "insert";
-				if (!checkCursorPosition(cursor.value.x + 1, cursor.value.y)) { return }
-				cursor.value.x++;
-				break;
-
-			// Switch in insert mode (if in normal) at the start of the line
-			case "A":
-				if (mode.value === "insert") { return }
-				event?.preventDefault();
-				mode.value = "insert";
-				cursor.value.x = lines.value[cursor.value.y].length + initialRowLen - 1;
-				break;
-
-			// Switch in insert mode (if in normal) at the start of the line
-			case "I":
-				if (mode.value === "insert") { return }
-				event?.preventDefault();
-				mode.value = "insert";
-				cursor.value.x = initialRowLen;
-				break;
-
-			// Insert a new line before the current one and switch in insert mode
-			case "O":
-				if (mode.value === "insert") { return }
-				event?.preventDefault();
-				mode.value = "insert";
-				lines.value.splice(cursor.value.y, 0, "\r");
-				cursor.value.x = initialRowLen;
-				break;
-
-			// Insert a new line after the current one and switch in insert mode
-			case "o":
-				if (mode.value === "insert") { return }
-				event?.preventDefault();
-				mode.value = "insert";
-				lines.value.splice(cursor.value.y + 1, 0, "\r");
-				cursor.value.y++;
-				cursor.value.x = initialRowLen;
-				break;
-
-            // Switch in insert mode (if in normal)
-            case "i":
-                if (mode.value === "insert") { return }
-                event?.preventDefault();
-                mode.value = "insert";
-                break;
-            
-            // Switch in normal mode
-            case "Escape":
-                mode.value = "normal";
-                break;
-
-
-            default:
-                break;
-        }
-
+		console.log("AUTOMATA :", automata.value);
+		
     }.bind(this));
 
 
