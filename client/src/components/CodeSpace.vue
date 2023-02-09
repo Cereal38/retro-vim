@@ -27,27 +27,70 @@
 	const transitions = (input) => {
 		
 		switch (automata.value) {
+
 			case INIT:
 				switch (input) {
 					case I:
 						automata.value = INSERT; break;
 					case ESC:
 						automata.value = INIT; break;
+					case "0":
+					case "1":
+					case "2":
+					case "3":
+					case "4":
+					case "5":
+					case "6":
+					case "7":
+					case "8":
+					case "9":
+						automata.value = NUM;
+						break;
 					default:
 						console.log("Error (Input unknown)");
 						automata.value = INIT; break;
 				}
 				break;
+
 			case INSERT:
 				switch (input) {
 					case ESC:
 						automata.value = INIT; break;
 					default:
-						console.log("TODO: Write input");
-						//lines.value[cursor.value.y] += input;
+						// Write the input in the keypress event listener
 						break;
 				}
 				break;
+
+			case NUM:
+				switch (input) {
+					case ESC:
+						automata.value = INIT; break;
+					case "0":
+					case "0":
+					case "1":
+					case "2":
+					case "3":
+					case "4":
+					case "5":
+					case "6":
+					case "7":
+					case "8":
+					case "9":
+					case "1":
+					case "2":
+					case "3":
+					case "4":
+					case "5":
+					case "6":
+					case "7":
+					case "8":
+					case "9":
+						break;
+					default:
+						break;
+				}
+
 			default:
 				console.log("ERROR (Current state unknown) :", automata.value);
 				return INIT;
@@ -64,6 +107,22 @@
 		transitions(e.key);
 
 		console.log("AUTOMATA :", automata.value);
+		
+    }.bind(this));
+
+    window.addEventListener("keypress", function(e) {
+
+		// If insert mode add the char to the char
+		if (automata.value == INSERT) {
+
+			// Except
+			if (e.key === "Enter") { return }
+
+			lines.value[cursor.value.y] += e.key;
+
+			// Move the cursor to the right
+			cursor.value.x++;
+		}
 		
     }.bind(this));
 
@@ -119,7 +178,7 @@
         <!-- Cursor -->
         <div 
             class="code-space__cursor-insert"
-            v-if="mode == 'insert'"
+            v-if="automata === 'INSERT'"
             :style="{
                 gridColumn: cursor.x + 1,
                 gridRow: cursor.y + 1,
@@ -127,7 +186,7 @@
         />
         <div 
             class="code-space__cursor-normal"
-            v-if="mode == 'normal'"
+            v-if="automata === 'INIT'"
             :style="{
                 gridColumn: cursor.x + 1,
                 gridRow: cursor.y + 1,
